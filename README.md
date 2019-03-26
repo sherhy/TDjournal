@@ -26,6 +26,7 @@ so much more for us "Humans."
 #### Now:
 Just remembered that someone told me the other day,
 > blablabla
+
 and I realised I didn't want to choose my dream from a menu.
 
 #### Today ({TODAY.strftime("%A")}):

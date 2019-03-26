@@ -2,8 +2,9 @@
 import os, re, sys
 from datetime import datetime, timedelta
 
-# TODO: arrow keys for navigation
 # TODO: calendar view, like a calendar app
+#   an idea is to make neat button DOMs after file names.
+#   use shelve for local db of current files, and render from that db
 TODAY = datetime.now()
 def ordinal(monthDay):
     ordInd = ["th", "st", "nd", "rd"]
@@ -31,15 +32,15 @@ def checkToday():
     with open(latestMD) as f:
         firstline = f.readline()
     if re.findall(r'(\d+)', firstline)[1] == TODAY.strftime("%Y%m%d"):
-        print(f"opening existing file: {latestMD}")
-        os.system(f"vi {latestMD}")
+        print(f"{latestMD} already exists")
+        os.system(f"open {latestMD}")
         return True
     return False
 
 # TODO: copy tasks from previous entry
 def makenew():
     tomorrow = (TODAY + timedelta(days=1)).strftime("%Y%m%d")
-    # TODO: broken link when firstline's tomorrow file doesn't exist
+    # ISSUE/TODO: broken link when firstline's tomorrow file doesn't exist
     firstline = f'[<-](./td{latest}.md) { TODAY.strftime("%Y%m%d")} [->](./td{tomorrow}.md)'
 
     template = f"""
@@ -59,7 +60,7 @@ def makenew():
 
 #### Today ({TODAY.strftime("%A")}):
 ###### Events:
-- 
+
 
 ###### Outcomes, Tasks, Questions:
 - 
@@ -68,9 +69,9 @@ def makenew():
 - 
 
 """
-    
+    # date header
     date = int(TODAY.strftime('%-d'))
-    footer = f'<title>Todo | {TODAY.strftime("%B")} {date}{ordinal(date)}</title>'
+    footer = f'<title>\nTodo | {TODAY.strftime("%B")} {date}{ordinal(date)}\n</title>'
 
     # create file
     newMD = f'td{TODAY.strftime("%Y%m%d")}.md'
@@ -80,14 +81,16 @@ def makenew():
         f.write(footer)
 
     # run command
-    print(f"vi {newMD}")
-    os.system(f"vi {newMD}")
+    print(f"{newMD} created")
+    # os.system(f"vi {newMD}")
 
 if __name__=="__main__":
     latest = latestNum()
     
     # input mode
-    if len(sys.argv) == 1: mode = input("(n)ew / (v)iew: ")
+    if len(sys.argv) == 1: 
+        # mode = input("(n)ew / (v)iew: ")
+        mode = 'new'
     elif len(sys.argv) == 2: mode = sys.argv[1]   
     else: mode = None
 
@@ -97,4 +100,4 @@ if __name__=="__main__":
     elif re.match(r'v',mode) != None: #view
         print(f"opening td{latest}.md")
         os.system(f"open td{latest}.md")
-    else: print("comon")
+    else: print("quitting")
