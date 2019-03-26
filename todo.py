@@ -31,17 +31,23 @@ def checkToday():
     latestMD = f"td{latest}.md"
     with open(latestMD) as f:
         firstline = f.readline()
+
     if re.findall(r'(\d+)', firstline)[1] == TODAY.strftime("%Y%m%d"):
         print(f"{latestMD} already exists")
         os.system(f"open {latestMD}")
         return True
     return False
 
-# TODO: copy tasks from previous entry
 def makenew():
     tomorrow = (TODAY + timedelta(days=1)).strftime("%Y%m%d")
     # ISSUE/TODO: broken link when firstline's tomorrow file doesn't exist
     firstline = f'[<-](./td{latest}.md) { TODAY.strftime("%Y%m%d")} [->](./td{tomorrow}.md)'
+
+    # copy tasks from previous entry
+    with open(f'td{latest}.md') as f:
+        tasks = '\n'.join(
+            re.findall(r'(\- \[ \] .+)', f.read())
+        )
 
     template = f"""
 ---
@@ -63,7 +69,7 @@ def makenew():
 
 
 ###### Outcomes, Tasks, Questions:
-- 
+{tasks}
 
 ###### Accomplishments:
 - 
@@ -71,7 +77,7 @@ def makenew():
 """
     # date header
     date = int(TODAY.strftime('%-d'))
-    footer = f'<title>\nTodo | {TODAY.strftime("%B")} {date}{ordinal(date)}\n</title>'
+    footer = f'<title>\n    Todo | {TODAY.strftime("%B")} {date}{ordinal(date)}\n</title>'
 
     # create file
     newMD = f'td{TODAY.strftime("%Y%m%d")}.md'
@@ -94,10 +100,12 @@ if __name__=="__main__":
     elif len(sys.argv) == 2: mode = sys.argv[1]   
     else: mode = None
 
-    if re.match(r'n|e',mode) != None: #new | edit
+    if re.match(r'n|e', mode) != None: #new | edit
         if not checkToday(): 
             makenew()
-    elif re.match(r'v',mode) != None: #view
+    elif re.match(r'v', mode) != None: #view
         print(f"opening td{latest}.md")
         os.system(f"open td{latest}.md")
+    elif re.match(r'test', mode) != None: #test
+        pass
     else: print("quitting")
