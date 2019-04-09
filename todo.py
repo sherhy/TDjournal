@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-import os, re, sys
+import os
+import re
+import sys
 from datetime import datetime, timedelta
 
 # TODO: calendar view, like a calendar app
 #   an idea is to make neat button DOMs after file names.
 #   use shelve for local db of current files, and render from that db
+#   Some shelve module, and sort into monthly buckets, create link DOM
+#   for each filename in bucket
 TODAY = datetime.now()
+
+
 def ordinal(monthDay):
     ordInd = ["th", "st", "nd", "rd"]
 
@@ -14,9 +20,8 @@ def ordinal(monthDay):
     else:
         return ordInd[0]
 
-# TODO: change naming scheme to dates, but in a way that's 
-#       backwards compatible and can be later removed
-def latestNum(): 
+
+def latestNum():
     filenums = set()
     for file in os.listdir('.'):
         filename = os.fsdecode(file)
@@ -26,7 +31,8 @@ def latestNum():
             except:
                 continue
     return max(filenums)
-         
+
+
 def checkToday():
     latestMD = f"td{latest}.md"
     with open(latestMD) as f:
@@ -38,11 +44,12 @@ def checkToday():
         return True
     return False
 
+
 def makenew():
     tomorrow = (TODAY + timedelta(days=1)).strftime("%Y%m%d")
-    # ISSUE/TODO: broken link when firstline's tomorrow file doesn't exist
     firstline = f'[<-](./td{latest}.md) { TODAY.strftime("%Y%m%d")} [->](./td{tomorrow}.md)'
 
+    # TODO: modify latest post's top line to link to today
     # copy tasks from previous entry
     with open(f'td{latest}.md') as f:
         tasks = '\n'.join(
@@ -68,7 +75,7 @@ def makenew():
 ###### Events:
 
 
-###### Outcomes, Tasks, Questions:
+###### Outcomes, Goals, Questions:
 {tasks}
 
 ###### Accomplishments:
@@ -90,22 +97,25 @@ def makenew():
     print(f"{newMD} created")
     # os.system(f"vi {newMD}")
 
-if __name__=="__main__":
+if __name__ == "__main__":
     latest = latestNum()
-    
+
     # input mode
-    if len(sys.argv) == 1: 
+    if len(sys.argv) == 1:
         # mode = input("(n)ew / (v)iew: ")
         mode = 'new'
-    elif len(sys.argv) == 2: mode = sys.argv[1]   
-    else: mode = None
+    elif len(sys.argv) == 2:
+        mode = sys.argv[1]
+    else:
+        mode = None
 
-    if re.match(r'n|e', mode) != None: #new | edit
-        if not checkToday(): 
+    if re.match(r'n|e', mode) != None:  # new | edit
+        if not checkToday():
             makenew()
-    elif re.match(r'v', mode) != None: #view
+    elif re.match(r'v', mode) != None:  # view
         print(f"opening td{latest}.md")
         os.system(f"open td{latest}.md")
-    elif re.match(r'test', mode) != None: #test
+    elif re.match(r'test', mode) != None:  # test
         pass
-    else: print("quitting")
+    else:
+        print("quitting")
