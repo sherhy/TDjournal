@@ -53,7 +53,7 @@ def makenew():
     # copy tasks from previous entry
     with open(f'td{latest}.md') as f:
         tasks = '\n'.join(
-            re.findall(r'(\- \[ \] .+)', f.read())
+            re.findall(r'(\-   \[ \] .+)', f.read())
         )
 
     template = f"""
