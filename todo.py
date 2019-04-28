@@ -45,16 +45,34 @@ def checkToday():
     return False
 
 
+def retrieveLatest():
+    latestMD = f"td{latest}.md"
+    with open(latestMD) as f:
+        firstline = f.readline()
+        theRest = f.read()
+
+    newFirstline = firstline[:-13] + TODAY.strftime("%Y%m%d") + ".md)"
+
+    with open(latestMD, "w") as f:
+        f.write(newFirstline)
+        f.write(theRest)
+
+    return '\n'.join(
+        re.findall(r'(\-   \[ \] .+)', theRest)
+    )
+
+
 def makenew():
     tomorrow = (TODAY + timedelta(days=1)).strftime("%Y%m%d")
     firstline = f'[<-](./td{latest}.md) { TODAY.strftime("%Y%m%d")} [->](./td{tomorrow}.md)'
 
     # TODO: modify latest post's top line to link to today
     # copy tasks from previous entry
-    with open(f'td{latest}.md') as f:
-        tasks = '\n'.join(
-            re.findall(r'(\-   \[ \] .+)', f.read())
-        )
+    tasks = retrieveLatest()
+    # with open(f'td{latest}.md') as f:
+    #     tasks = '\n'.join(
+    #         re.findall(r'(\-   \[ \] .+)', f.read())
+    #     )
 
     template = f"""
 ---
@@ -116,6 +134,7 @@ if __name__ == "__main__":
         print(f"opening td{latest}.md")
         os.system(f"open td{latest}.md")
     elif re.match(r'test', mode) != None:  # test
+        updateLatest()
         pass
     else:
         print("quitting")
