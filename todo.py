@@ -51,7 +51,7 @@ def retrieveLatest():
         firstline = f.readline()
         theRest = f.read()
 
-    newFirstline = firstline[:-13] + TODAY.strftime("%Y%m%d") + ".md)"
+    newFirstline = firstline[:-13] + TODAY.strftime("%Y%m%d") + ".md)\n"
 
     with open(latestMD, "w") as f:
         f.write(newFirstline)
@@ -63,8 +63,8 @@ def retrieveLatest():
 
 
 def makenew():
-    tomorrow = (TODAY + timedelta(days=1)).strftime("%Y%m%d")
-    firstline = f'[<-](./td{latest}.md) { TODAY.strftime("%Y%m%d")} [->](./td{tomorrow}.md)'
+    today = TODAY.strftime("%Y%m%d")
+    firstline = f'[<-](./td{latest}.md) {today} [->](./td{today}.md)'
 
     # TODO: modify latest post's top line to link to today
     # copy tasks from previous entry
@@ -78,13 +78,13 @@ def makenew():
 ---
 #### Yesterday:
 ###### What did I learn?
-- 
+-   
 
 ###### What did I read?
-- 
+-   
 
 ###### What did I do to help my future?
-- 
+-   
 
 #### Now:
 
@@ -97,7 +97,7 @@ def makenew():
 {tasks}
 
 ###### Accomplishments:
-- 
+-   
 
 """
     # date header
@@ -136,5 +136,4 @@ if __name__ == "__main__":
     elif re.match(r'test', mode) != None:  # test
         updateLatest()
         pass
-    else:
-        print("quitting")
+
