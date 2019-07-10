@@ -40,7 +40,7 @@ def checkToday():
 
     if re.findall(r'(\d+)', firstline)[1] == TODAY.strftime("%Y%m%d"):
         print(f"{latestMD} already exists")
-        os.system(f"open {latestMD}")
+        os.system(f"vi {latestMD}")
         return True
     return False
 
@@ -120,19 +120,19 @@ if __name__ == "__main__":
 
     # input mode
     if len(sys.argv) == 1:
-        # mode = input("(n)ew / (v)iew: ")
         mode = 'new'
     elif len(sys.argv) == 2:
         mode = sys.argv[1]
     else:
-        mode = None
+        mode = input("(n)ew / (v)iew: ")
+        # mode = None
 
     if re.match(r'n|e', mode) != None:  # new | edit
         if not checkToday():
             makenew()
-    elif re.match(r'v', mode) != None:  # view
+    elif re.match(r'v', mode) != None:  # view in chrome
         print(f"opening td{latest}.md")
-        os.system(f"open td{latest}.md")
+        os.system(f'open -a "Google Chrome" td{latest}.md')
     elif re.match(r'test', mode) != None:  # test
         updateLatest()
         pass
