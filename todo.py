@@ -30,6 +30,7 @@ def latestNum():
                 filenums.add(int(re.search(r'[0-9]+', filename).group()))
             except:
                 continue
+    return filenums
     return max(filenums)
 
 
@@ -78,26 +79,20 @@ def makenew():
 ---
 #### Yesterday:
 ###### What did I learn?
--   
 
 ###### What did I read?
--   
 
 ###### What did I do to help my future?
--   
 
 #### Now:
 
-
 #### Today ({TODAY.strftime("%A")}):
 ###### Events:
-
 
 ###### Outcomes, Goals, Questions:
 {tasks}
 
 ###### Accomplishments:
--   
 
 """
     # date header
@@ -113,10 +108,10 @@ def makenew():
 
     # run command
     print(f"{newMD} created")
-    # os.system(f"vi {newMD}")
+    os.system(f"vi {newMD}")
 
 if __name__ == "__main__":
-    latest = latestNum()
+    latest = max(latestNum())
 
     # input mode
     if len(sys.argv) == 1:
@@ -130,6 +125,10 @@ if __name__ == "__main__":
     if re.match(r'n|e', mode) != None:  # new | edit
         if not checkToday():
             makenew()
+    elif re.match(r'p', mode) != None: # edit previous
+        previous = sorted(list(latestNum()))[-2]
+        print(f"opening td{previous}.md")
+        os.system(f'vim td{previous}.md')
     elif re.match(r'v', mode) != None:  # view in chrome
         print(f"opening td{latest}.md")
         os.system(f'open -a "Google Chrome" td{latest}.md')
