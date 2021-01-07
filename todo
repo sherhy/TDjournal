@@ -11,7 +11,7 @@ from datetime import datetime
 #   Some shelve module, and sort into monthly buckets, create link DOM
 #   for each filename in bucket
 TODAY = datetime.now()
-PRJ_DIR = '/Users/jjeong/TDjournal/'
+PRJ_DIR = '/Users/jjeong/TDjournal/td/'
 
 
 def ordinal(monthDay):
@@ -98,7 +98,7 @@ def make_new_md():
 
     # create file
     newMD = f'td{TODAY.strftime("%Y%m%d")}.md'
-    with open(newMD, 'w+') as f:
+    with open(f"{PRJ_DIR}{newMD}", 'w+') as f:
         f.write(firstline)
         f.write(template)
         f.write(footer)
@@ -125,13 +125,15 @@ if __name__ == "__main__":
 
     file_numbers = get_file_dates()
     latest = max(file_numbers)
-    todays_md = get_todays_md()
     editor = "subl" if args.sublime else "vi"
 
     if args.list:
         for number in sorted(list(file_numbers))[-args.n:]:
             print(f"{PRJ_DIR}td{number}.md")
-    elif args.edit:
+        sys.exit(0)
+
+    todays_md = get_todays_md()
+    if args.edit:
         open_with_editor(editor, f"td{latest}.md")
     elif args.edit_previous:
         previous = sorted(list(file_numbers))[-2]

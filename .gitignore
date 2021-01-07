@@ -1,7 +1,5 @@
 .DS_Store
 __pycache__
-td*.md
-.td*
-test.py
+td/
 .idea/
-.README.md.icloud
+.README.md
