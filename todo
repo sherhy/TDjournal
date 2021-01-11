@@ -59,7 +59,7 @@ def retrieve_tasks():
         f.write(theRest)
 
     return '\n'.join(
-        re.findall(r'(\-   \[ \] .+)', theRest)
+        re.findall(r'(\- \[ \] .+)', theRest)
     )
 
 
