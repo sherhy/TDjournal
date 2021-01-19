@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import argparse
+from functools import lru_cache
 from datetime import datetime
 
 # TODO: calendar view, like a calendar app
@@ -23,6 +24,7 @@ def ordinal(monthDay):
         return ordInd[0]
 
 
+@lru_cache(maxsize=None)
 def get_file_dates():
     filenums = set()
     for file in os.listdir(PRJ_DIR):
@@ -35,8 +37,19 @@ def get_file_dates():
     return filenums
 
 
+@lru_cache(maxsize=None)
+def get_latest_date():
+    dates = get_file_dates()
+    return max(dates)
+
+
+@lru_cache(maxsize=None)
+def get_latest_md():
+    return f"td{get_latest_date()}.md"
+
+
 def get_todays_md():
-    latest_md = f"td{latest}.md"
+    latest_md = get_latest_md()
     with open(f"{PRJ_DIR}{latest_md}") as f:
         firstline = f.readline()
 
@@ -47,7 +60,7 @@ def get_todays_md():
 
 
 def retrieve_tasks():
-    latest_md = f"td{latest}.md"
+    latest_md = get_latest_md()
     with open(f"{PRJ_DIR}{latest_md}") as f:
         firstline = f.readline()
         theRest = f.read()
@@ -65,6 +78,7 @@ def retrieve_tasks():
 
 def make_new_md():
     today = TODAY.strftime("%Y%m%d")
+    latest = get_latest_date()
     firstline = f'[<-](./td{latest}.md) {today} [->](./td{today}.md)'
 
     # TODO: modify latest post's top line to link to today
@@ -107,39 +121,39 @@ def make_new_md():
     return newMD
 
 
-def open_with_editor(editor, filename):
+def run_command_arugment(editor, filename):
     print(f"opening {filename}")
     os.system(f"{editor} {PRJ_DIR}{filename}")
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument('-n', '--new', action='store_true', help="can choose editor")
+    p.add_argument('-l', '--list', action='store_true', help="list")
+    p.add_argument('-v', '--view', action='store_true', help="view from chrome")
     p.add_argument('-e', '--edit', action='store_true', help="can choose editor")
     p.add_argument('-p', '--edit-previous', action='store_true', help="can choose editor")
-    p.add_argument('-v', '--view', action='store_true', help="view from chrome")
     p.add_argument('-s', '--sublime', action='store_true', help="open with sublime, default editor is vi")
-    p.add_argument('-l', '--list', action='store_true', help="list")
+    p.add_argument('-n', '--new', action='store_true', help="can choose editor")
     p.add_argument('n', type=int, nargs="?", default=5, help="limit")
     args = p.parse_args()
 
     file_numbers = get_file_dates()
-    latest = max(file_numbers)
     editor = "subl" if args.sublime else "vi"
 
+    if args.view:
+        run_command_arugment('open -a "Google Chrome"', get_latest_md())
     if args.list:
         for number in sorted(list(file_numbers))[-args.n:]:
             print(f"{PRJ_DIR}td{number}.md")
-        sys.exit(0)
-
-    todays_md = get_todays_md()
-    if args.edit:
-        open_with_editor(editor, f"td{latest}.md")
+    elif args.edit:
+        run_command_arugment(editor, get_latest_md())
     elif args.edit_previous:
         previous = sorted(list(file_numbers))[-2]
-        open_with_editor(editor, f"td{previous}.md")
-    elif args.view:
-        open_with_editor('open -a "Google Chrome"', f"td{latest}.md")
-    else:  # args.new
+        run_command_arugment(editor, f"td{previous}.md")
+    elif args.new:
+        todays_md = get_todays_md()
         file_name = make_new_md() if todays_md is None else todays_md
-        open_with_editor(editor, file_name)
+        run_command_arugment(editor, file_name)
+    sys.exit(0)
+
+
