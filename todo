@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import argparse
+import logging
 from functools import lru_cache
 from datetime import datetime
 
@@ -13,6 +14,7 @@ from datetime import datetime
 #   for each filename in bucket
 TODAY = datetime.now()
 PRJ_DIR = '/Users/jjeong/TDjournal/td/'
+FORMATTER = '%(asctime)s:%(levelname)s: %(message)s'
 
 
 def ordinal(monthDay):
@@ -54,7 +56,7 @@ def get_todays_md():
         firstline = f.readline()
 
     if re.findall(r'(\d+)', firstline)[1] == TODAY.strftime("%Y%m%d"):
-        print(f"{latest_md} already exists")
+        logging.info(f"{latest_md} already exists")
         return latest_md
     return None
 
@@ -117,34 +119,37 @@ def make_new_md():
         f.write(template)
         f.write(footer)
 
-    print(f"{newMD} created")
+    logging.info(f"{newMD} created")
     return newMD
 
 
 def run_command_arugment(editor, filename):
-    print(f"opening {filename}")
+    logging.info(f"opening {filename}")
     os.system(f"{editor} {PRJ_DIR}{filename}")
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
+    p.add_argument('-n', '--new', action='store_true', help="can choose editor")
     p.add_argument('-l', '--list', action='store_true', help="list")
-    p.add_argument('-v', '--view', action='store_true', help="view from chrome")
+    p.add_argument('n', type=int, nargs="?", default=5, help="limit")
+    p.add_argument('-v', '--verbose', action='store_true', help="verbose logging (debug)")
+    p.add_argument('-c', '--chrome', action='store_true', help="view from chrome")
     p.add_argument('-e', '--edit', action='store_true', help="can choose editor")
     p.add_argument('-p', '--edit-previous', action='store_true', help="can choose editor")
     p.add_argument('-s', '--sublime', action='store_true', help="open with sublime, default editor is vi")
-    p.add_argument('-n', '--new', action='store_true', help="can choose editor")
-    p.add_argument('n', type=int, nargs="?", default=5, help="limit")
     args = p.parse_args()
 
     file_numbers = get_file_dates()
     editor = "subl" if args.sublime else "vi"
+    level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(level=level, format=FORMATTER)
 
-    if args.view:
+    if args.chrome:
         run_command_arugment('open -a "Google Chrome"', get_latest_md())
     if args.list:
         for number in sorted(list(file_numbers))[-args.n:]:
-            print(f"{PRJ_DIR}td{number}.md")
+            logging.info(f"{PRJ_DIR}td{number}.md")
     elif args.edit:
         run_command_arugment(editor, get_latest_md())
     elif args.edit_previous:
@@ -154,6 +159,9 @@ if __name__ == "__main__":
         todays_md = get_todays_md()
         file_name = make_new_md() if todays_md is None else todays_md
         run_command_arugment(editor, file_name)
+    else:
+        logging.warn("no arguments given")
+        p.print_usage()
     sys.exit(0)
 
 
