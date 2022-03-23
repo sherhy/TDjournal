@@ -89,22 +89,22 @@ def make_new_md():
 
     template = f"""
 ---
-#### Yesterday:
-###### What did I learn?
+### Yesterday:
+##### What did I do?
 
-###### What did I read?
+##### What did I learn?
 
-###### What did I do to help my future?
+##### What did I do to help my future?
 
-#### Now:
+## Today ({TODAY.strftime("%A")}):
+#### Now
 
-#### Today ({TODAY.strftime("%A")}):
-###### Events:
-
-###### Outcomes, Goals, Questions:
+##### Tasks, Goals, Questions
 {tasks}
 
-###### Accomplishments:
+###### Blockers
+
+##### Events
 
 """
     # date header
@@ -147,6 +147,7 @@ if __name__ == "__main__":
 
     if args.chrome:
         run_command_arugment('open -a "Google Chrome"', get_latest_md())
+        sys.exit(0)
     if args.list:
         for number in sorted(list(file_numbers))[-args.n:]:
             logging.info(f"{PRJ_DIR}td{number}.md")
@@ -160,8 +161,7 @@ if __name__ == "__main__":
         file_name = make_new_md() if todays_md is None else todays_md
         run_command_arugment(editor, file_name)
     else:
-        logging.warn("no arguments given")
-        p.print_usage()
+        run_command_arugment(editor, get_latest_md())
     sys.exit(0)
 
 
