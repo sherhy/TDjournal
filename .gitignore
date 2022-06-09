@@ -2,4 +2,5 @@
 __pycache__
 td/
 .idea/
-.README.md
+entries
+.env

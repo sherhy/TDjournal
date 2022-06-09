@@ -4,6 +4,7 @@ import re
 import sys
 import argparse
 import logging
+import pathlib
 from functools import lru_cache
 from datetime import datetime
 
@@ -12,8 +13,9 @@ from datetime import datetime
 #   use shelve for local db of current files, and render from that db
 #   Some shelve module, and sort into monthly buckets, create link DOM
 #   for each filename in bucket
+
+PRJ_DIR = os.path.join(pathlib.Path(__file__).parent.resolve(), "entries/")
 TODAY = datetime.now()
-PRJ_DIR = '/Users/jjeong/TDjournal/td/'
 FORMATTER = '%(asctime)s:%(levelname)s: %(message)s'
 
 
@@ -134,7 +136,6 @@ if __name__ == "__main__":
     p.add_argument('-l', '--list', action='store_true', help="list")
     p.add_argument('n', type=int, nargs="?", default=5, help="limit")
     p.add_argument('-v', '--verbose', action='store_true', help="verbose logging (debug)")
-    p.add_argument('-c', '--chrome', action='store_true', help="view from chrome")
     p.add_argument('-e', '--edit', action='store_true', help="can choose editor")
     p.add_argument('-p', '--edit-previous', action='store_true', help="can choose editor")
     p.add_argument('-s', '--sublime', action='store_true', help="open with sublime, default editor is vi")
@@ -145,9 +146,6 @@ if __name__ == "__main__":
     level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(level=level, format=FORMATTER)
 
-    if args.chrome:
-        run_command_arugment('open -a "Google Chrome"', get_latest_md())
-        sys.exit(0)
     if args.list:
         for number in sorted(list(file_numbers))[-args.n:]:
             logging.info(f"{PRJ_DIR}td{number}.md")
